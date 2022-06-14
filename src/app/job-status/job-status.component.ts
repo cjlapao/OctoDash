@@ -1,3 +1,4 @@
+import { MMU2FilamentSelect } from './../model/mmu2filament.model';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
@@ -16,7 +17,8 @@ import { SocketService } from '../services/socket/socket.service';
 export class JobStatusComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
-  public jobStatus: JobStatus;
+    public jobStatus: JobStatus;
+    public mmuSelection: MMU2FilamentSelect;
   public thumbnail: string;
   public showPreviewWhilePrinting: boolean;
 
@@ -30,7 +32,13 @@ export class JobStatusComponent implements OnInit, OnDestroy {
     this.showPreviewWhilePrinting = this.configService.showThumbnailByDefault();
   }
 
-  public ngOnInit(): void {
+    public ngOnInit(): void {
+        const test = this.configService.getApiURL('mmu2filamentselect')
+        // console.log(test)
+        this.socketService.getMMUFilamentSelectSubscribable().subscribe((m: MMU2FilamentSelect): void => {
+            console.log(JSON.stringify(m))
+            this.mmuSelection = m
+        })
     this.subscriptions.add(
       this.socketService.getJobStatusSubscribable().subscribe((jobStatus: JobStatus): void => {
         if (jobStatus.file !== this.jobStatus?.file) {
@@ -83,6 +91,7 @@ export class JobStatusComponent implements OnInit, OnDestroy {
   }
 
   public useCircularProgressBar(): boolean {
-    return this.configService.getPreviewProgressCircle();
+      return this.configService.getPreviewProgressCircle();
   }
+
 }

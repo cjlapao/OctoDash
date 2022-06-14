@@ -4,6 +4,7 @@ import _ from 'lodash-es';
 import { Observable, of, ReplaySubject, Subject } from 'rxjs';
 import { catchError, pluck, startWith } from 'rxjs/operators';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { MMU2FilamentSelect } from 'src/app/model/mmu2filament.model';
 
 import { ConfigService } from '../../config/config.service';
 import { ConversionService } from '../../conversion.service';
@@ -36,12 +37,13 @@ export class OctoPrintSocketService implements SocketService {
 
   private printerStatusSubject: Subject<PrinterStatus>;
   private jobStatusSubject: Subject<JobStatus>;
-  private eventSubject: Subject<PrinterEvent>;
+    private eventSubject: Subject<PrinterEvent>;
+    private mmu2FilamentSelectSubject: Subject<MMU2FilamentSelect>;
   private statusTextSubject: Subject<string>;
 
   private printerStatus: PrinterStatus;
   private jobStatus: JobStatus;
-  private lastState: PrinterEvent;
+    private lastState: PrinterEvent;
 
   public constructor(
     private configService: ConfigService,
@@ -51,7 +53,8 @@ export class OctoPrintSocketService implements SocketService {
     private http: HttpClient,
   ) {
     this.printerStatusSubject = new ReplaySubject<PrinterStatus>(1);
-    this.jobStatusSubject = new Subject<JobStatus>();
+      this.jobStatusSubject = new Subject<JobStatus>();
+      this.mmu2FilamentSelectSubject = new Subject<MMU2FilamentSelect>();
     this.eventSubject = new ReplaySubject<PrinterEvent>(5);
     this.statusTextSubject = new ReplaySubject<string>(1);
   }
@@ -154,7 +157,7 @@ export class OctoPrintSocketService implements SocketService {
     this.socket.next(payload);
   }
 
-  private handlePluginMessage(pluginMessage: OctoprintPluginMessage) {
+    private handlePluginMessage(pluginMessage: OctoprintPluginMessage) {
     const plugins = [
       {
         check: (plugin: string) =>
@@ -167,7 +170,11 @@ export class OctoPrintSocketService implements SocketService {
       {
         check: (plugin: string) => ['action_command_prompt', 'action_command_notification'].includes(plugin),
         handler: (message: unknown) => this.handlePrinterNotification(message as PrinterNotification),
-      },
+        },
+        {
+            check: (plugin: string) => plugin === 'mmu2filamentselect',
+            handler: (message: unknown) => { this.mmu2FilamentSelectSubject.next(message as MMU2FilamentSelect)},
+          },
     ];
 
     plugins.forEach(plugin => plugin.check(pluginMessage.plugin.plugin) && plugin.handler(pluginMessage.plugin.data));
@@ -428,5 +435,10 @@ export class OctoPrintSocketService implements SocketService {
 
   public getPrinterStatusText(): Observable<string> {
     return this.statusTextSubject;
-  }
+    }
+    
+    
+    public getMMUFilamentSelectSubscribable(): Observable<MMU2FilamentSelect> {
+        return this.mmu2FilamentSelectSubject
+    }
 }

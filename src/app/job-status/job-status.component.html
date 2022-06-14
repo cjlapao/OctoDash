@@ -53,7 +53,9 @@
       <ng-container i18n="@@job-info__time-left"> left, </ng-container>
     </span>
     <ng-container i18n="@@job-elapsed">elapsed:</ng-container>
-    {{ jobStatus.timePrinted.value }}{{ jobStatus.timePrinted.unit }}
+    {{ jobStatus.timePrinted.value }}{{ jobStatus.timePrinted.unit }}    
+    <ng-container i18n="@@job-elapsed">test:</ng-container>
+    {{ jobStatus.estimatedEndTime }}
   </span>
 </div>
 
@@ -119,5 +121,5 @@
 </div>
 
 <div class="job-info__no-job" *ngIf="!isFileLoaded() && !isPrinting()" i18n="@@no-job">no job running ...</div>
-
+<div *ngIf="mmuSelection" >{{ mmuSelection.action }} </div>
 <span id="jobTogglePreview" (click)="togglePreview()"></span>

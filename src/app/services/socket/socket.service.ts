@@ -1,3 +1,4 @@
+import { MMU2FilamentSelect } from './../../model/mmu2filament.model';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -13,5 +14,7 @@ export abstract class SocketService {
 
   abstract getJobStatusSubscribable(): Observable<JobStatus>;
 
-  abstract getEventSubscribable(): Observable<PrinterEvent | PrinterNotification>;
+    abstract getEventSubscribable(): Observable<PrinterEvent | PrinterNotification>;
+    
+    abstract getMMUFilamentSelectSubscribable(): Observable<MMU2FilamentSelect>;
 }

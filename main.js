@@ -55,6 +55,7 @@ function createWindow() {
       nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false,
+      devTools: true
     },
     icon: path.join(__dirname, 'dist', 'assets', 'icon', 'icon.png'),
   });
